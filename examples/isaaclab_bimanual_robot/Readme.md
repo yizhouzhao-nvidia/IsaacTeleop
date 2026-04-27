@@ -7,6 +7,26 @@ SPDX-License-Identifier: Apache-2.0
 
 This directory contains minimal usage examples for teleoperating two UR arms in IsaacLab.
 
+
+
+
+## How to run
+
+```bash
+python scripts/zero_agent.py --task Template-UR5e-Play-v0 --num_envs=1
+```
+
+```bash
+source ~/.cloudxr/run/cloudxr.env
+python scripts/teleop_se3_agent_bimanual_xr.py \
+  --task Template-UR5e-Play-v0 \
+  --teleop_device motion_controllers \
+  --num_envs 1 \
+  --xr
+```
+
+
+
 ## Prerequisite
 
 ```
