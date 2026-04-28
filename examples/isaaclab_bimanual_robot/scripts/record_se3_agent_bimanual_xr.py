@@ -88,7 +88,7 @@ if args_cli.enable_pinocchio:
     import isaaclab_tasks.manager_based.manipulation.pick_place  # noqa: F401
 
 import MimicG1.tasks  # noqa: F401
-from MimicG1.tasks.manager_based.ur5e.retargeter import BimanualOpenXRRetargeter
+from MimicG1.tasks.manager_based.ur10.retargeter import BimanualOpenXRRetargeter
 
 from isaaclab.devices.device_base import DeviceBase
 

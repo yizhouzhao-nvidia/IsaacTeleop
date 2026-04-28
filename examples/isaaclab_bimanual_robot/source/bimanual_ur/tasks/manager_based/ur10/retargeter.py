@@ -135,7 +135,7 @@ class BimanualOpenXRRetargeter(RetargeterBase):
 
 @dataclass
 class BimanualOpenXRRetargeterCfg(RetargeterCfg):
-    """Configuration for the bimanual UR5E OpenXR retargeter."""
+    """Configuration for the bimanual UR10 OpenXR retargeter."""
 
     enable_visualization: bool = False
     retargeter_type: type[RetargeterBase] = BimanualOpenXRRetargeter

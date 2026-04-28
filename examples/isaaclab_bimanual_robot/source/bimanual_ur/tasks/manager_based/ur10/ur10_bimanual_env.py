@@ -23,8 +23,8 @@ import isaaclab.sim as sim_utils
 ##
 # Pre-defined configs
 ##
-from .universal_robots import UR5E_LEFT_CFG, UR5E_RIGHT_CFG  # isort: skip
-from .reach_env_cfg import TestEnvCfg
+from .universal_robots import UR10_LEFT_CFG, UR10_RIGHT_CFG  # isort: skip
+from .base_env_cfg import BaseEnvCfg
 from .dummy_retargeter import DummyRetargeterCfg
 
 
@@ -34,10 +34,10 @@ from .dummy_retargeter import DummyRetargeterCfg
 
 
 @configclass
-class UR5EBimanualEnvCfg(TestEnvCfg):
+class UR10BimanualEnvCfg(BaseEnvCfg):
     # Position of the XR anchor in the world frame
     xr: XrCfg = XrCfg(
-        anchor_pos=(0.5, -0.2, -0.15),
+        anchor_pos=(0.7, -0.2, -0.15),
         anchor_rot=(1, 0, 0, 0),
     )
 
@@ -45,10 +45,10 @@ class UR5EBimanualEnvCfg(TestEnvCfg):
         # post init of parent
         super().__post_init__()
 
-        self.scene.left_robot = UR5E_LEFT_CFG.replace(
+        self.scene.left_robot = UR10_LEFT_CFG.replace(
             prim_path="{ENV_REGEX_NS}/left_robot",
         )
-        self.scene.right_robot = UR5E_RIGHT_CFG.replace(
+        self.scene.right_robot = UR10_RIGHT_CFG.replace(
             prim_path="{ENV_REGEX_NS}/right_robot",
         )
 

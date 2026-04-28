@@ -6,10 +6,10 @@
 import gymnasium as gym
 
 gym.register(
-    id="Template-UR5e-Play-v0",
+    id="Template-UR10-Play-v0",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
-        "env_cfg_entry_point": f"{__name__}.joint_pos_env_cfg:UR5EBimanualEnvCfg",
+        "env_cfg_entry_point": f"{__name__}.ur10_bimanual_env:UR10BimanualEnvCfg",
     },
 )

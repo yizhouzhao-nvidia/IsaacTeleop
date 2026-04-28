@@ -23,7 +23,7 @@ from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
 # Configuration
 ##
 
-UR5E_LEFT_CFG = ArticulationCfg(
+UR10_LEFT_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
         usd_path=f"{ISAACLAB_NUCLEUS_DIR}/Robots/UniversalRobots/UR10/ur10_instanceable.usd",
     ),
@@ -57,7 +57,7 @@ UR5E_LEFT_CFG = ArticulationCfg(
 )
 
 
-UR5E_RIGHT_CFG = ArticulationCfg(
+UR10_RIGHT_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
         usd_path=f"{ISAACLAB_NUCLEUS_DIR}/Robots/UniversalRobots/UR10/ur10_instanceable.usd",
     ),

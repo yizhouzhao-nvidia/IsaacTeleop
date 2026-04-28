@@ -7,23 +7,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-import numpy as np
 import torch
 
 import isaaclab.sim as sim_utils
-import isaaclab.utils.math as PoseUtils
-from isaaclab.devices.device_base import DeviceBase
 from isaaclab.devices.retargeter_base import RetargeterBase, RetargeterCfg
 from isaaclab.markers import VisualizationMarkers, VisualizationMarkersCfg
 
 
 class DummyRetargeter(RetargeterBase):
-    """Simple retargeter that maps motion controller inputs to G1 hand joints.
-
-    Mapping:
-    - A button (digital 0/1) → Thumb joints
-    - Trigger (analog 0-1) → Index finger joints
-    - Squeeze (analog 0-1) → Middle finger joints
+    """Dummy retargeter that maps motion controller inputs to robot commands.
     """
 
     def __init__(self, cfg: DummyRetargeterCfg):
@@ -51,18 +43,6 @@ class DummyRetargeter(RetargeterBase):
 
     def retarget(self, data: dict) -> torch.Tensor:
         """Convert controller inputs to robot commands.
-
-        Args:
-            data: Dictionary with MotionControllerTrackingTarget.LEFT/RIGHT keys
-                 Each value is a 2D array: [pose(7), inputs(7)]
-
-        Returns:
-            Tensor: [left_wrist(7), right_wrist(7), hand_joints(14)]
-            hand_joints order:
-                [
-                    left_proximal(3), right_proximal(3), left_distal(2), left_thumb_middle(1),
-                    right_distal(2), right_thumb_middle(1), left_thumb_tip(1), right_thumb_tip(1)
-                ]
         """
         pass
 
