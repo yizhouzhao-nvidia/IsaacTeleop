@@ -9,17 +9,9 @@ This directory contains minimal usage examples for teleoperating two UR arms in 
 
 ## Prerequisites
 
-### 1.Isaac Lab
 
-Follow [Install Isaac Lab](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html) to install Isaac Lab with virtual environment `env_isaaclab`.
 
-After installation, activate the virtual environment:
-
-```bash
-source <your_isaaclab_path>/env_isaaclab/bin/activate
-```
-
-### 2.Isaac Teleop
+### 1.Isaac Teleop
 
 Follow [Install Isaac Teleop](https://isaac-sim.github.io/IsaacLab/main/source/how-to/cloudxr_teleoperation.html#cloudxr-teleoperation) to install Isaac Teleop.
 
@@ -29,27 +21,42 @@ After installation, start the ClourXR server:
 python -m isaacteleop.cloudxr
 ```
 
-### 3. Install this package
+### 2.Isaac Lab
+
+Follow [Install Isaac Lab](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html) to install Isaac Lab with virtual environment `env_isaaclab`.
+
+After installation, activate the virtual environment:
+
+```bash
+source <your_isaaclab_path>/env_isaaclab/bin/activate
+```
+
+### 3. Install this package to `env_isaaclab`
 
 ```bash
 python -m pip install -e .
-```
 
-If you use uv:
-
-```bash
-uv pip install -e .
+## If you use uv:
+# uv pip install -e .
 ```
 
 ## How to run
+
+1. Source cloudxr env
 
 ```bash
 source ~/.cloudxr/run/cloudxr.env
 ```
 
+2. Run the task
+
+To examine the task environment only:
+
 ```bash
 python scripts/zero_agent.py --task Template-UR10-Play-v0 --num_envs=1
 ```
+
+Teleoperation with XR controllers:
 
 ```bash
 python scripts/teleop_se3_agent_bimanual_xr.py \
@@ -59,29 +66,29 @@ python scripts/teleop_se3_agent_bimanual_xr.py \
   --xr
 ```
 
+Key bindings:
+- Press any button on the left controller to start teleoperation
+- Move the left controller to control the left arm
+- Move the right controller to control the right arm
+- Press x or y buttons on the left controller to reset
 
 
-## Prerequisite
+Record data:
 
+```bash
+python scripts/record_se3_agent_bimanual_xr.py \
+  --task Template-UR10-Play-v0 \
+  --teleop_device motion_controllers \
+  --num_envs 1 \
+  --xr \
+  --dataset_file ./datasets/dataset.hdf5
 ```
-pip install lerobot
-```
 
-## Examples
+Key bindings:
+- Press any button on the left controller to start teleoperation
+- Move the left controller to control the left arm
+- Move the right controller to control the right arm
+- Press x or y buttons on the left controller to reset
+- Press a or b buttons on the right controller to save the trajectory and reset env
 
-- **record.py**
-  Record a dataset in the LeRobot format from live human data. Currently it only
-  captures head and hands position for demonstrations purpose.
-
-  Note: the record.py script always create a new dataset. You must remove
-  existing one before running it again:
-
-  ```bash
-  rm -rf local_datasets
-  ```
-
-- **visualize.py**
-  A basic rerun visualizer to plot out the dataset.
-
-- **analyze.py**
-  A quick sample to parse and analyze the LeRobot dataset.
+The dataset will be saved to `./datasets/dataset.hdf5`

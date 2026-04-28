@@ -37,7 +37,7 @@ from .dummy_retargeter import DummyRetargeterCfg
 class UR10BimanualEnvCfg(BaseEnvCfg):
     # Position of the XR anchor in the world frame
     xr: XrCfg = XrCfg(
-        anchor_pos=(0.7, -0.2, -0.15),
+        anchor_pos=(0.55, -0.3, -0.15),
         anchor_rot=(1, 0, 0, 0),
     )
 

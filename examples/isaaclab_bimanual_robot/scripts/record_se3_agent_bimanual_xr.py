@@ -87,8 +87,8 @@ if args_cli.enable_pinocchio:
     import isaaclab_tasks.manager_based.locomanipulation.pick_place  # noqa: F401
     import isaaclab_tasks.manager_based.manipulation.pick_place  # noqa: F401
 
-import MimicG1.tasks  # noqa: F401
-from MimicG1.tasks.manager_based.ur10.retargeter import BimanualOpenXRRetargeter
+import bimanual_ur.tasks  # noqa: F401
+from bimanual_ur.tasks.manager_based.ur10.retargeter import BimanualOpenXRRetargeter
 
 from isaaclab.devices.device_base import DeviceBase
 
@@ -294,7 +294,7 @@ def main() -> None:
     # init controller
     retargeter = BimanualOpenXRRetargeter(env, env.sim.device)
 
-    print("Teleoperation started. Press 'R' to reset the environment.")
+    print("Teleoperation started.")
 
     start_button_pressed = False
     # simulate environment
@@ -343,16 +343,17 @@ def main() -> None:
                 ctrl_right_pos_cur = torch.tensor(right_controller_data[0, 0:3], device=env.sim.device)
                 ctrl_right_quat_cur = torch.tensor(right_controller_data[0, 3:7], device=env.sim.device)
 
-                gripper_left = -1.0 if np.sum(left_controller_data[1]) > 0 else 1.0
-                gripper_right = -1.0 if np.sum(right_controller_data[1]) > 0 else 1.0
+                ## [Optional] add key binding for gripper control
+                # gripper_left = -1.0 if np.sum(left_controller_data[1]) > 0 else 1.0 # any button pressed
+                # gripper_right = -1.0 if np.sum(right_controller_data[1]) > 0 else 1.0 # any button pressed
 
                 compute_action = retargeter.compute_action(
                     ctrl_left_pos_cur,
                     ctrl_left_quat_cur,
                     ctrl_right_pos_cur,
                     ctrl_right_quat_cur,
-                    gripper_left,
-                    gripper_right,
+                    gripper_left = None, # [Optional] add gripper control
+                    gripper_right = None, # [Optional] add gripper control
                     scale=0.6,
                 )
 
@@ -363,6 +364,7 @@ def main() -> None:
                 if np.sum(left_controller_data[1][4:6]) > 0:
                     should_reset_recording_instance = True
 
+                # press a or b to reset env and save recording
                 if np.sum(right_controller_data[1][4:6]) > 0:
                     should_reset_recording_instance = True
                     successful = True

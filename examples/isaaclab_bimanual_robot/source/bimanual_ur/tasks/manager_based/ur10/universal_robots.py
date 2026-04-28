@@ -8,8 +8,8 @@
 
 The following configuration parameters are available:
 
-* :obj:`UR5E_LEFT_CFG`: The UR5E arm without a gripper (left side).
-* :obj:`UR5E_RIGHT_CFG`: The UR5E arm without a gripper (right side).
+* :obj:`UR10_LEFT_CFG`: The UR10 arm without a gripper (left side).
+* :obj:`UR10_RIGHT_CFG`: The UR10 arm without a gripper (right side).
 
 Reference: https://github.com/ros-industrial/universal_robot
 """

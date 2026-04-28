@@ -258,7 +258,7 @@ def main() -> None:
     # init controller
     retargeter = BimanualOpenXRRetargeter(env, env.sim.device)
 
-    print("Teleoperation started. Press 'R' to reset the environment.")
+    print("Teleoperation started.")
 
 
     start_button_pressed = False
@@ -273,11 +273,12 @@ def main() -> None:
                 raw_data = teleop_interface._get_raw_data()
                 left_controller_data = np.array(raw_data.get(DeviceBase.TrackingTarget.CONTROLLER_LEFT, np.array([])))
                 right_controller_data = np.array(raw_data.get(DeviceBase.TrackingTarget.CONTROLLER_RIGHT, np.array([])))
-                # robot root pose from observation/scene
-                if np.random.rand() < 0.05:
-                    print("[time]", time.time())
-                    print("[left_controller_data]: ", left_controller_data)
-                    print("[right_controller_data]: ", right_controller_data)
+                
+                # # Randomly print teleoperation controller data for debugging
+                # if np.random.rand() < 0.05:
+                #     print("[time]", time.time())
+                #     print("[left_controller_data]: ", left_controller_data)
+                #     print("[right_controller_data]: ", right_controller_data)
 
                 if left_controller_data.shape[0] == 0 or right_controller_data.shape[0] == 0:
                     env.sim.render()
@@ -302,13 +303,19 @@ def main() -> None:
                     ctrl_right_quat_init = right_controller_data[0, 3:7]
                     retargeter.reset(ctrl_left_pos_init, ctrl_left_quat_init, ctrl_right_pos_init, ctrl_right_quat_init)
 
-                ctrl_left_pos_cur = torch.tensor(left_controller_data[0, 0:3], device=env.sim.device)
-                ctrl_left_quat_cur = torch.tensor(left_controller_data[0, 3:7], device=env.sim.device)
-                ctrl_right_pos_cur = torch.tensor(right_controller_data[0, 0:3], device=env.sim.device)
-                ctrl_right_quat_cur = torch.tensor(right_controller_data[0, 3:7], device=env.sim.device)
+                ctrl_left_pos_current = torch.tensor(left_controller_data[0, 0:3], device=env.sim.device)
+                ctrl_left_quat_current = torch.tensor(left_controller_data[0, 3:7], device=env.sim.device)
+                ctrl_right_pos_current = torch.tensor(right_controller_data[0, 0:3], device=env.sim.device)
+                ctrl_right_quat_current = torch.tensor(right_controller_data[0, 3:7], device=env.sim.device)
+               
+
+                # # TODO: implement gripper control
+                # gripper_left = -1.0 if np.sum(left_controller_data[1]) > 0 else 1.0
+                # gripper_right = -1.0 if np.sum(right_controller_data[1]) > 0 else 1.0
 
                 compute_action = retargeter.compute_action(
-                    ctrl_left_pos_cur, ctrl_left_quat_cur, ctrl_right_pos_cur, ctrl_right_quat_cur, 
+                    ctrl_left_pos_current, ctrl_left_quat_current, ctrl_right_pos_current, ctrl_right_quat_current, 
+                    gripper_left=None, gripper_right=None,
                     scale=1.0, # smaller scale to make it slower and less sensitive
                     )
                 
@@ -327,13 +334,6 @@ def main() -> None:
 
                     start_button_pressed = False
                     retargeter._initialized = False
-
-
-                # if should_reset_recording_instance:
-                #     env.reset()
-                #     teleop_interface.reset()
-                #     should_reset_recording_instance = False
-                #     print("Environment reset complete")
 
                 
         except Exception as e:

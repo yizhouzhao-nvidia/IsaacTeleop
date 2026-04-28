@@ -53,10 +53,14 @@ class BimanualOpenXRRetargeter(RetargeterBase):
         ctrl_left_pos_w: torch.Tensor,  # (3,) current left  controller pos in world
         ctrl_left_quat_w: torch.Tensor,  # (4,) [w,x,y,z]
         ctrl_right_pos_w: torch.Tensor,
-        ctrl_right_quat_w: torch.Tensor,  
+        ctrl_right_quat_w: torch.Tensor,
+        gripper_left: float = None,
+        gripper_right: float = None,
         scale: float = 1.0,
     ) -> torch.Tensor:
         """Returns action tensor of shape (1, 14) = [left_7D, right_7D]."""
+
+        has_gripper = gripper_left is not None and gripper_right is not None
 
         left = self._delta_action(
             ctrl_left_pos_w,
@@ -79,14 +83,17 @@ class BimanualOpenXRRetargeter(RetargeterBase):
             scale,
         )
 
-        return torch.cat(
-            [
-                left,
-                right,
-            ]
-        ).unsqueeze(
-            0
-        )  # (1, 14)
+        if has_gripper:
+            return torch.cat(
+                [
+                    left,
+                    torch.tensor([gripper_left], device=self.device),
+                    right,
+                    torch.tensor([gripper_right], device=self.device),
+                ]
+            ).unsqueeze(0)
+        else:
+            return torch.cat([left, right]).unsqueeze(0)
 
     def _delta_action(
         self,
@@ -126,16 +133,18 @@ class BimanualOpenXRRetargeter(RetargeterBase):
         ctrl_left_quat_w,
         ctrl_right_pos_w,
         ctrl_right_quat_w,
+        gripper_left,
+        gripper_right,
         scale=1.0,
     ):
         return self.compute_action(
-            ctrl_left_pos_w, ctrl_left_quat_w, ctrl_right_pos_w, ctrl_right_quat_w, scale
+            ctrl_left_pos_w, ctrl_left_quat_w, ctrl_right_pos_w, ctrl_right_quat_w, gripper_left, gripper_right, scale
         )
 
 
 @dataclass
 class BimanualOpenXRRetargeterCfg(RetargeterCfg):
-    """Configuration for the bimanual UR10 OpenXR retargeter."""
+    """Configuration for the bimanual UR5E OpenXR retargeter."""
 
     enable_visualization: bool = False
     retargeter_type: type[RetargeterBase] = BimanualOpenXRRetargeter
