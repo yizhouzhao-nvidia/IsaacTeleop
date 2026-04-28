@@ -82,8 +82,9 @@ if args_cli.enable_pinocchio:
     import isaaclab_tasks.manager_based.locomanipulation.pick_place  # noqa: F401
     import isaaclab_tasks.manager_based.manipulation.pick_place  # noqa: F401
 
-import bimanual_ur.tasks  # noqa: F401
-from bimanual_ur.tasks.manager_based.ur10.retargeter import BimanualOpenXRRetargeter
+import bimanual.tasks  # noqa: F401
+from bimanual.tasks.manager_based.common.retargeter import BimanualOpenXRRetargeter
+
 
 from isaaclab.utils.math import subtract_frame_transforms
 from isaaclab.devices.device_base import DeviceBase

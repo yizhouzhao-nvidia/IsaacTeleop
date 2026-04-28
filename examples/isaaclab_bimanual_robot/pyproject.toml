@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 [project]
-name = "bimanual_ur"
+name = "bimanual"
 version = "0.1.0"
 
 [project.optional-dependencies]

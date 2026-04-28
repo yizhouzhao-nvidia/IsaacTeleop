@@ -36,7 +36,7 @@ import isaaclab_tasks  # noqa: F401
 from isaaclab_tasks.utils import parse_env_cfg
 from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
 
-import bimanual_ur.tasks  # noqa: F401
+import bimanual.tasks  # noqa: F401
 
 
 def main():

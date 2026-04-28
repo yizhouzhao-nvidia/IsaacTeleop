@@ -23,9 +23,11 @@ import isaaclab.sim as sim_utils
 ##
 # Pre-defined configs
 ##
+
+from bimanual.tasks.manager_based.common.base_env_cfg import BaseEnvCfg
+from bimanual.tasks.manager_based.common.dummy_retargeter import DummyRetargeterCfg
+
 from .universal_robots import UR10_LEFT_CFG, UR10_RIGHT_CFG  # isort: skip
-from .base_env_cfg import BaseEnvCfg
-from .dummy_retargeter import DummyRetargeterCfg
 
 
 ##
@@ -86,6 +88,21 @@ class UR10BimanualEnvCfg(BaseEnvCfg):
             scale=1.0,
             body_offset=DifferentialInverseKinematicsActionCfg.OffsetCfg(pos=[0.0, 0.0, 0.13]),
         )
+
+        ## [Optional] Gripper control
+        # self.actions.left_gripper_action = mdp.BinaryJointVelocityActionCfg(
+        #     asset_name="left_robot",
+        #     joint_names=["finger_joint"],
+        #     open_command_expr={"finger_joint": -0.5},  # rad/s, opening direction
+        #     close_command_expr={"finger_joint": 0.5},  # rad/s, closing direction — tune this value
+        # )
+
+        # self.actions.right_gripper_action = mdp.BinaryJointVelocityActionCfg(
+        #     asset_name="right_robot",
+        #     joint_names=["finger_joint"],
+        #     open_command_expr={"finger_joint": -0.5},  # rad/s, opening direction
+        #     close_command_expr={"finger_joint": 0.5},  # rad/s, closing direction — tune this value
+        # )
 
 
         self.teleop_devices = DevicesCfg(

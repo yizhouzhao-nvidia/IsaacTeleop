@@ -9,8 +9,8 @@ Script to print all the available environments in Isaac Lab.
 The script iterates over all registered environments and stores the details in a table.
 It prints the name of the environment, the entry point and the config file.
 
-All the environments are registered in the `MimicG1` extension. They start
-with `Isaac` in their name.
+All the environments are registered in the `Bimanual` extension. They start
+with `Template-` in their name.
 """
 
 """Launch Isaac Sim Simulator first."""
@@ -35,11 +35,11 @@ simulation_app = app_launcher.app
 import gymnasium as gym
 from prettytable import PrettyTable
 
-import MimicG1.tasks  # noqa: F401
+import bimanual.tasks  # noqa: F401
 
 
 def main():
-    """Print all environments registered in `MimicG1` extension."""
+    """Print all environments registered in `Bimanual` extension."""
     # print all the available environments
     table = PrettyTable(["S. No.", "Task Name", "Entry Point", "Config"])
     table.title = "Available Environments in Isaac Lab"
