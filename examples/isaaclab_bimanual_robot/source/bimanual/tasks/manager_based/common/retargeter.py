@@ -57,6 +57,7 @@ class BimanualOpenXRRetargeter(RetargeterBase):
         gripper_left: float = None,
         gripper_right: float = None,
         scale: float = 1.0,
+        reverse_yz: bool = True,
     ) -> torch.Tensor:
         """Returns action tensor of shape (1, 14) = [left_7D, right_7D]."""
 
@@ -71,6 +72,7 @@ class BimanualOpenXRRetargeter(RetargeterBase):
             self.ee_left_quat_init,
             self.robot_left_quat_w,
             scale,
+            reverse_yz,
         )
         right = self._delta_action(
             ctrl_right_pos_w,
@@ -81,6 +83,7 @@ class BimanualOpenXRRetargeter(RetargeterBase):
             self.ee_right_quat_init,
             self.robot_right_quat_w,
             scale,
+            reverse_yz,
         )
 
         if has_gripper:
@@ -104,7 +107,8 @@ class BimanualOpenXRRetargeter(RetargeterBase):
         ee_pos_init_b: torch.Tensor,  # robot EE initial pos in base frame
         ee_quat_init_b: torch.Tensor,  # robot EE initial quat in base frame
         robot_quat_w: torch.Tensor,  # robot base orientation in world [w,x,y,z]
-        scale: float,
+        scale: float = 1.0, # scale factor for the delta position
+        reverse_yz: bool = True, # swap y and z dimensions of delta_quat [w, x, y, z] -> swap indices 2 and 3, negate Z
     ) -> torch.Tensor:
         # 1. Position delta in world frame
         delta_pos_w = ctrl_pos_w - ctrl_pos_init  # (3,)
@@ -121,8 +125,9 @@ class BimanualOpenXRRetargeter(RetargeterBase):
 
         # 5. Apply rotation delta to initial EE orientation
         # Interchange Y and Z dimensions of delta_quat [w, x, y, z] -> swap indices 2 and 3, negate Z
-        delta_quat = delta_quat * torch.tensor([1.0, -1.0, 1.0, 1.0], device=delta_quat.device)
-        delta_quat = delta_quat[[0, 1, 3, 2]]
+        if reverse_yz:
+            delta_quat = delta_quat * torch.tensor([1.0, -1.0, 1.0, 1.0], device=delta_quat.device)
+            delta_quat = delta_quat[[0, 1, 3, 2]]
         desired_quat_b = quat_mul(delta_quat.unsqueeze(0), ee_quat_init_b.unsqueeze(0)).squeeze(0)
 
         return torch.cat([desired_pos_b, desired_quat_b])  # (7,)

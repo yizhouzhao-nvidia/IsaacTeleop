@@ -54,6 +54,8 @@ To examine the task environment only:
 
 ```bash
 python scripts/zero_agent.py --task Template-UR10-Play-v0 --num_envs=1
+
+python scripts/zero_agent.py --task Template-FlexivRizon-Play-v0 --num_envs=1
 ```
 
 Teleoperation with XR controllers:
@@ -63,7 +65,16 @@ python scripts/teleop_se3_agent_bimanual_xr.py \
   --task Template-UR10-Play-v0 \
   --teleop_device motion_controllers \
   --num_envs 1 \
-  --xr
+  --xr \
+  --reverse_rotation_yz
+
+python scripts/teleop_se3_agent_bimanual_xr.py \
+  --task Template-FlexivRizon-Play-v0 \
+  --teleop_device motion_controllers \
+  --num_envs 1 \
+  --xr \
+  --sensitivity 0.5 \
+  --enable_gripper
 ```
 
 Key bindings:

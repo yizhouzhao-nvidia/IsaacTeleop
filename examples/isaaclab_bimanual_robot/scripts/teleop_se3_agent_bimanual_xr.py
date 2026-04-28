@@ -35,6 +35,8 @@ parser.add_argument(
 )
 parser.add_argument("--task", type=str, default=None, help="Name of the task.")
 parser.add_argument("--sensitivity", type=float, default=1.0, help="Sensitivity factor.")
+parser.add_argument("--reverse_rotation_yz", action="store_true", default=False, help="Reverse rotation yz.")
+parser.add_argument("--enable_gripper", action="store_true", default=False, help="Enable gripper control.")
 parser.add_argument(
     "--enable_pinocchio",
     action="store_true",
@@ -310,14 +312,22 @@ def main() -> None:
                 ctrl_right_quat_current = torch.tensor(right_controller_data[0, 3:7], device=env.sim.device)
                
 
-                # # TODO: implement gripper control
-                # gripper_left = -1.0 if np.sum(left_controller_data[1]) > 0 else 1.0
-                # gripper_right = -1.0 if np.sum(right_controller_data[1]) > 0 else 1.0
+                if args_cli.enable_gripper:
+                    gripper_left = 1.0 if np.sum(left_controller_data[1]) > 0 else -1.0
+                    gripper_right = 1.0 if np.sum(right_controller_data[1]) > 0 else -1.0
+                else:
+                    gripper_left = None
+                    gripper_right = None
+
+                if np.random.rand() < 0.05:
+                    print("[gripper_left]: ", gripper_left)
+                    print("[gripper_right]: ", gripper_right)
 
                 compute_action = retargeter.compute_action(
                     ctrl_left_pos_current, ctrl_left_quat_current, ctrl_right_pos_current, ctrl_right_quat_current, 
-                    gripper_left=None, gripper_right=None,
-                    scale=1.0, # smaller scale to make it slower and less sensitive
+                    gripper_left=gripper_left, gripper_right=gripper_right,
+                    scale=args_cli.sensitivity, # smaller scale to make it slower and less sensitive
+                    reverse_yz=args_cli.reverse_rotation_yz,
                     )
                 
                 # print("[compute_action]: ", compute_action)

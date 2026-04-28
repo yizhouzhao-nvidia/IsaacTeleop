@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-import os
+import numpy as np
 
 from isaaclab.utils import configclass
 
@@ -23,7 +23,7 @@ import isaaclab.sim as sim_utils
 ##
 # Pre-defined configs
 ##
-from bimanual.tasks.manager_based.ur10.universal_robots import UR10_LEFT_CFG, UR10_RIGHT_CFG  # isort: skip
+from .flexiv_rizon_robots import FLEXIV_RIZON_4S_CFG  # isort: skip
 from bimanual.tasks.manager_based.common.base_env_cfg import BaseEnvCfg
 from bimanual.tasks.manager_based.common.dummy_retargeter import DummyRetargeterCfg
 
@@ -45,11 +45,37 @@ class FlexivRizonBimanualEnvCfg(BaseEnvCfg):
         # post init of parent
         super().__post_init__()
 
-        self.scene.left_robot = UR10_LEFT_CFG.replace(
+        self.scene.left_robot = FLEXIV_RIZON_4S_CFG.replace(
             prim_path="{ENV_REGEX_NS}/left_robot",
+            init_state=FLEXIV_RIZON_4S_CFG.InitialStateCfg(
+                pos=(0.0, 1.5, 1.0),
+                rot=(0.7071, 0.7071, 0.0, 0.0),
+                joint_pos={
+                    "joint1": -1.5708,
+                    "joint2": 1.5708,
+                    "joint3": 0.0,
+                    "joint4": 1.5708,
+                    "joint5": 0.0,
+                    "joint6": 0.0,
+                    "joint7": 0.0,
+                }
+            ),
         )
-        self.scene.right_robot = UR10_RIGHT_CFG.replace(
+        self.scene.right_robot = FLEXIV_RIZON_4S_CFG.replace(
             prim_path="{ENV_REGEX_NS}/right_robot",
+            init_state=FLEXIV_RIZON_4S_CFG.InitialStateCfg(
+                pos=(1.0, 1.5, 1.0),
+                rot=(0.7071, 0.7071, 0.0, 0.0),
+                joint_pos={
+                    "joint1": -1.5708,
+                    "joint2": 1.5708,
+                    "joint3": 0.0,
+                    "joint4": 1.5708,
+                    "joint5": 0.0,
+                    "joint6": 0.0,
+                    "joint7": 0.0,
+                }
+            ),
         )
 
         # Replace joint-position arm action with differential IK (relative pose)
@@ -58,49 +84,51 @@ class FlexivRizonBimanualEnvCfg(BaseEnvCfg):
         self.actions.left_arm_action = DifferentialInverseKinematicsActionCfg(
             asset_name="left_robot",
             joint_names=[
-                "shoulder_pan_joint",
-                "shoulder_lift_joint",
-                "elbow_joint",
-                "wrist_1_joint",
-                "wrist_2_joint",
-                "wrist_3_joint",
+                "joint1",
+                "joint2",
+                "joint3",
+                "joint4",
+                "joint5",
+                "joint6",
+                "joint7",
             ],
-            body_name="wrist_3_link",
+            body_name="gripper_base",
             controller=DifferentialIKControllerCfg(command_type="pose", use_relative_mode=False, ik_method="dls"),
             scale=1.0,
-            body_offset=DifferentialInverseKinematicsActionCfg.OffsetCfg(pos=[0.0, 0.0, 0.13]),
+            body_offset=DifferentialInverseKinematicsActionCfg.OffsetCfg(pos=[0.0, 0.0, 0.2]),
         )
 
         self.actions.right_arm_action = DifferentialInverseKinematicsActionCfg(
             asset_name="right_robot",
             joint_names=[
-                "shoulder_pan_joint",
-                "shoulder_lift_joint",
-                "elbow_joint",
-                "wrist_1_joint",
-                "wrist_2_joint",
-                "wrist_3_joint",
+                "joint1",
+                "joint2",
+                "joint3",
+                "joint4",
+                "joint5",
+                "joint6",
+                "joint7",
             ],
-            body_name="wrist_3_link",
+            body_name="gripper_base",
             controller=DifferentialIKControllerCfg(command_type="pose", use_relative_mode=False, ik_method="dls"),
             scale=1.0,
-            body_offset=DifferentialInverseKinematicsActionCfg.OffsetCfg(pos=[0.0, 0.0, 0.13]),
+            body_offset=DifferentialInverseKinematicsActionCfg.OffsetCfg(pos=[0.0, 0.0, 0.2]),
         )
 
-        ## [Optional] Gripper control
-        # self.actions.left_gripper_action = mdp.BinaryJointVelocityActionCfg(
-        #     asset_name="left_robot",
-        #     joint_names=["finger_joint"],
-        #     open_command_expr={"finger_joint": -0.5},  # rad/s, opening direction
-        #     close_command_expr={"finger_joint": 0.5},  # rad/s, closing direction — tune this value
-        # )
+        # [Optional] Gripper control
+        self.actions.left_gripper_action = mdp.BinaryJointVelocityActionCfg(
+            asset_name="left_robot",
+            joint_names=["finger_joint"],
+            open_command_expr={"finger_joint": 0.1},  # rad/s, opening direction
+            close_command_expr={"finger_joint": -0.1},  # rad/s, closing direction — tune this value
+        )
 
-        # self.actions.right_gripper_action = mdp.BinaryJointVelocityActionCfg(
-        #     asset_name="right_robot",
-        #     joint_names=["finger_joint"],
-        #     open_command_expr={"finger_joint": -0.5},  # rad/s, opening direction
-        #     close_command_expr={"finger_joint": 0.5},  # rad/s, closing direction — tune this value
-        # )
+        self.actions.right_gripper_action = mdp.BinaryJointVelocityActionCfg(
+            asset_name="right_robot",
+            joint_names=["finger_joint"],
+            open_command_expr={"finger_joint": 0.1},  # rad/s, opening direction
+            close_command_expr={"finger_joint": -0.1},  # rad/s, closing direction — tune this value
+        )
 
 
         self.teleop_devices = DevicesCfg(
