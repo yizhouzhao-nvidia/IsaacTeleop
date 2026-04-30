@@ -102,7 +102,8 @@ class FlexivRizonBimanualEnvCfg(BaseEnvCfg):
                 command_type="pose",
                 use_relative_mode=False,
                 ik_method="dls",
-                joint_weights=torch.tensor([10.0, 10.0, 10.0, 10.0, 10.0, 1.0, 0.5])
+                ik_params={"lambda_val": 0.05},
+                joint_weights=torch.tensor([10.0, 10.0, 1.0, 1.0, 1.0, 1.0, 1.0])
             ),
             scale=1.0,
             body_offset=FlexivRizonDifferentialInverseKinematicsActionCfg.OffsetCfg(pos=(0.0, 0.0, 0.2)),

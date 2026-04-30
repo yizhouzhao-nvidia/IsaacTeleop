@@ -54,10 +54,10 @@ FLEXIV_RIZON_4S_CFG = ArticulationCfg(
                 "joint6",
                 "joint7",
             ],
-            effort_limit_sim=2000.0,
-            stiffness=500000.0,
-            damping=100.0,
-            velocity_limit=0.2,
+            effort_limit_sim=4000.0,
+            stiffness=40000.0,
+            damping=400.0,
+            velocity_limit=2.0,
         ),
         "finger_joint": ImplicitActuatorCfg(
             joint_names_expr=[
