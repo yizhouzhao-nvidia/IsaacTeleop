@@ -128,6 +128,9 @@ class BimanualOpenXRRetargeter(RetargeterBase):
         if reverse_yz:
             delta_quat = delta_quat * torch.tensor([1.0, -1.0, 1.0, 1.0], device=delta_quat.device)
             delta_quat = delta_quat[[0, 1, 3, 2]]
+        else: # reverse_xy
+            delta_quat = delta_quat * torch.tensor([1.0, 1.0, -1.0, 1.0], device=delta_quat.device)
+            delta_quat = delta_quat[[0, 2, 1, 3]]
         desired_quat_b = quat_mul(delta_quat.unsqueeze(0), ee_quat_init_b.unsqueeze(0)).squeeze(0)
 
         return torch.cat([desired_pos_b, desired_quat_b])  # (7,)

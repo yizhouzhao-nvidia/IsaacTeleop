@@ -24,6 +24,7 @@ from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
 ##
 
 ASSET_URL = "https://github.com/flexivrobotics/isaac_sim_ws/raw/refs/heads/main/exts/isaacsim.robot.manipulators.examples/data/flexiv/Rizon4s_with_Grav.usd"
+# ASSET_URL = "/home/linfan/Downloads/Rizon4s_with_Grav_without_gripper.usd"
 
 FLEXIV_RIZON_4S_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
@@ -54,8 +55,9 @@ FLEXIV_RIZON_4S_CFG = ArticulationCfg(
                 "joint7",
             ],
             effort_limit_sim=2000.0,
-            stiffness=10000.0,
-            damping=50.0,
+            stiffness=500000.0,
+            damping=100.0,
+            velocity_limit=0.2,
         ),
         "finger_joint": ImplicitActuatorCfg(
             joint_names_expr=[

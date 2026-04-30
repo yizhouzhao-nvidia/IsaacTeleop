@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import numpy as np
+import torch
 
 from isaaclab.utils import configclass
 
@@ -15,6 +16,7 @@ from isaaclab.devices.device_base import DevicesCfg
 from isaaclab.devices.keyboard import Se3KeyboardCfg
 from isaaclab.devices.spacemouse import Se3SpaceMouseCfg
 from isaaclab.envs.mdp.actions.actions_cfg import DifferentialInverseKinematicsActionCfg
+from .ik.task_space_actions import FlexivRizonDifferentialInverseKinematicsActionCfg
 from isaaclab.devices.openxr import OpenXRDeviceCfg, XrCfg
 from isaaclab.sensors import CameraCfg
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg, RigidObjectCfg
@@ -27,6 +29,7 @@ from .flexiv_rizon_robots import FLEXIV_RIZON_4S_CFG  # isort: skip
 from bimanual.tasks.manager_based.common.base_env_cfg import BaseEnvCfg
 from bimanual.tasks.manager_based.common.dummy_retargeter import DummyRetargeterCfg
 
+from .ik.differential_ik_cfg import FlexivRizonDifferentialIKControllerCfg
 
 ##
 # Environment configuration
@@ -35,11 +38,13 @@ from bimanual.tasks.manager_based.common.dummy_retargeter import DummyRetargeter
 
 @configclass
 class FlexivRizonBimanualEnvCfg(BaseEnvCfg):
-    # Position of the XR anchor in the world frame
-    xr: XrCfg = XrCfg(
-        anchor_pos=(0.55, -0.3, -0.15),
-        anchor_rot=(1, 0, 0, 0),
-    )
+    def __init__(self):
+        super().__init__()
+
+        self.scene.table.init_state = AssetBaseCfg.InitialStateCfg(
+            pos=[0.70, 0.5, 0.82],
+            rot=[0.0, 0.0, 0.0, -1.0]
+        )
 
     def __post_init__(self):
         # post init of parent
@@ -48,10 +53,10 @@ class FlexivRizonBimanualEnvCfg(BaseEnvCfg):
         self.scene.left_robot = FLEXIV_RIZON_4S_CFG.replace(
             prim_path="{ENV_REGEX_NS}/left_robot",
             init_state=FLEXIV_RIZON_4S_CFG.InitialStateCfg(
-                pos=(0.0, 1.5, 1.0),
-                rot=(0.7071, 0.7071, 0.0, 0.0),
+                pos=(0.0, 0.0, 1.0),
+                rot=(0.7071, 0, 0.7071, 0.0),
                 joint_pos={
-                    "joint1": -1.5708,
+                    "joint1": 0.0,
                     "joint2": 1.5708,
                     "joint3": 0.0,
                     "joint4": 1.5708,
@@ -64,10 +69,10 @@ class FlexivRizonBimanualEnvCfg(BaseEnvCfg):
         self.scene.right_robot = FLEXIV_RIZON_4S_CFG.replace(
             prim_path="{ENV_REGEX_NS}/right_robot",
             init_state=FLEXIV_RIZON_4S_CFG.InitialStateCfg(
-                pos=(1.0, 1.5, 1.0),
-                rot=(0.7071, 0.7071, 0.0, 0.0),
+                pos=(0.0, 0.8, 1.0),
+                rot=(0.7071, 0, 0.7071, 0.0),
                 joint_pos={
-                    "joint1": -1.5708,
+                    "joint1": 0.0,
                     "joint2": 1.5708,
                     "joint3": 0.0,
                     "joint4": 1.5708,
@@ -81,7 +86,7 @@ class FlexivRizonBimanualEnvCfg(BaseEnvCfg):
         # Replace joint-position arm action with differential IK (relative pose)
         # NOTE: body_offset.pos is the TCP offset from ee_link along its z-axis (~130 mm for Robotiq 2F-85).
         # Verify against the actual USD if needed.
-        self.actions.left_arm_action = DifferentialInverseKinematicsActionCfg(
+        self.actions.left_arm_action = FlexivRizonDifferentialInverseKinematicsActionCfg(
             asset_name="left_robot",
             joint_names=[
                 "joint1",
@@ -93,9 +98,14 @@ class FlexivRizonBimanualEnvCfg(BaseEnvCfg):
                 "joint7",
             ],
             body_name="gripper_base",
-            controller=DifferentialIKControllerCfg(command_type="pose", use_relative_mode=False, ik_method="dls"),
+            controller=FlexivRizonDifferentialIKControllerCfg(
+                command_type="pose",
+                use_relative_mode=False,
+                ik_method="dls",
+                joint_weights=torch.tensor([10.0, 10.0, 10.0, 10.0, 10.0, 1.0, 0.5])
+            ),
             scale=1.0,
-            body_offset=DifferentialInverseKinematicsActionCfg.OffsetCfg(pos=[0.0, 0.0, 0.2]),
+            body_offset=FlexivRizonDifferentialInverseKinematicsActionCfg.OffsetCfg(pos=(0.0, 0.0, 0.2)),
         )
 
         self.actions.right_arm_action = DifferentialInverseKinematicsActionCfg(
@@ -152,7 +162,10 @@ class FlexivRizonBimanualEnvCfg(BaseEnvCfg):
                         ),
                     ],
                     sim_device=self.sim.device,
-                    xr_cfg=self.xr,
+                    xr_cfg= XrCfg(
+                        anchor_pos = (1.5, 0.4, -0.2),
+                        anchor_rot = (0, 0.7071, 0, 0.7071)
+                    ),
                 ),
             }
         )
