@@ -277,28 +277,19 @@ def main() -> None:
                 left_controller_data = np.array(raw_data.get(DeviceBase.TrackingTarget.CONTROLLER_LEFT, np.array([])))
                 right_controller_data = np.array(raw_data.get(DeviceBase.TrackingTarget.CONTROLLER_RIGHT, np.array([])))
                 
-                # # Randomly print teleoperation controller data for debugging
-                # if np.random.rand() < 0.05:
-                #     print("[time]", time.time())
-                #     print("[left_controller_data]: ", left_controller_data)
-                #     print("[right_controller_data]: ", right_controller_data)
-
                 if left_controller_data.shape[0] == 0 or right_controller_data.shape[0] == 0:
                     env.sim.render()
                     continue
 
-                if np.random.rand() < 0.05:
-                    print("[left_controller_data] buttons: ", np.sum(left_controller_data[1]))
-                    print("[right_controller_data] buttons: ", np.sum(right_controller_data[1]))
-
                 # add an initialization condition; press left trigger to start
-                if np.sum(left_controller_data[1]) > 0: # and np.sum(right_controller_data[1]) > 0:
+                if np.sum(left_controller_data[1]) > 0:
                     start_button_pressed = True
 
                 if not start_button_pressed:
                     env.sim.render()
                     continue
                 
+                # init retargeter if not initialized, record the initial positions and orientations of the controllers
                 if not retargeter._initialized:
                     ctrl_left_pos_init = left_controller_data[0, 0:3]
                     ctrl_left_quat_init = left_controller_data[0, 3:7]
@@ -306,12 +297,13 @@ def main() -> None:
                     ctrl_right_quat_init = right_controller_data[0, 3:7]
                     retargeter.reset(ctrl_left_pos_init, ctrl_left_quat_init, ctrl_right_pos_init, ctrl_right_quat_init)
 
+                # obtain current positions and orientations of the controllers
                 ctrl_left_pos_current = torch.tensor(left_controller_data[0, 0:3], device=env.sim.device)
                 ctrl_left_quat_current = torch.tensor(left_controller_data[0, 3:7], device=env.sim.device)
                 ctrl_right_pos_current = torch.tensor(right_controller_data[0, 0:3], device=env.sim.device)
                 ctrl_right_quat_current = torch.tensor(right_controller_data[0, 3:7], device=env.sim.device)
                
-
+                # obtain gripper commands
                 if args_cli.enable_gripper:
                     gripper_left = 1.0 if np.sum(left_controller_data[1]) > 0 else -1.0
                     gripper_right = 1.0 if np.sum(right_controller_data[1]) > 0 else -1.0
@@ -319,10 +311,7 @@ def main() -> None:
                     gripper_left = None
                     gripper_right = None
 
-                if np.random.rand() < 0.05:
-                    print("[gripper_left]: ", gripper_left)
-                    print("[gripper_right]: ", gripper_right)
-
+                # compute action
                 compute_action = retargeter.compute_action(
                     ctrl_left_pos_current, ctrl_left_quat_current, ctrl_right_pos_current, ctrl_right_quat_current, 
                     gripper_left=gripper_left, gripper_right=gripper_right,
@@ -330,9 +319,7 @@ def main() -> None:
                     reverse_yz=args_cli.reverse_rotation_yz,
                     )
                 
-                # print("[compute_action]: ", compute_action)
                 obs, _, _, _, _= env.step(compute_action)
-                # print("[obs]: ", obs)
 
                 # press x or y to reset
                 if np.sum(left_controller_data[1][4:6]) > 0:
